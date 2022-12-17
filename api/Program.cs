@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
+builder.Services.AddDbContext<ApplicationDbContext>();
 
 var config = app.Configuration;
 Console.WriteLine(config.GetSection("Logging"));
@@ -126,7 +127,7 @@ public class Product{
 
 public class ApplicationDbContext: DbContext{
     public DbSet<Product> Products {get; set;}
-    protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlServer();
+    protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlServer("Server=localhost;Database=Products;User Id=sa;Password=HaYaBuSa10022004@;MultipleActiveResultSets=true;Encrypt=YES;TrustServerCertificate=YES");
 
 }
 
