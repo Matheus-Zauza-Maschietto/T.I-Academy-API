@@ -1,0 +1,6 @@
+C:\Users\mathe\OneDrive\Documentos\GitHub\DotNetAPI\apiweb\obj\Debug\net6.0\apiweb.csproj.AssemblyReference.cache
+C:\Users\mathe\OneDrive\Documentos\GitHub\DotNetAPI\apiweb\obj\Debug\net6.0\apiweb.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\mathe\OneDrive\Documentos\GitHub\DotNetAPI\apiweb\obj\Debug\net6.0\apiweb.AssemblyInfoInputs.cache
+C:\Users\mathe\OneDrive\Documentos\GitHub\DotNetAPI\apiweb\obj\Debug\net6.0\apiweb.AssemblyInfo.cs
+C:\Users\mathe\OneDrive\Documentos\GitHub\DotNetAPI\apiweb\obj\Debug\net6.0\apiweb.csproj.CoreCompileInputs.cache
+C:\Users\mathe\OneDrive\Documentos\GitHub\DotNetAPI\apiweb\obj\Debug\net6.0\apiweb.MvcApplicationPartsAssemblyInfo.cache
