@@ -1,14 +1,15 @@
 using System;
 using System.IO.Pipes;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
-builder.Services.AddDbContext<ApplicationDbContext>();
 
+builder.Services.AddSqlServer<ApplicationDbContext>(builder.Configuration["Database:SqlServer"]);
+
+var app = builder.Build();
 var config = app.Configuration;
-Console.WriteLine(config.GetSection("Logging"));
+
+
 
 app.MapGet("/", () => "Hello World!");
 
@@ -90,66 +91,3 @@ app.MapGet("/baseConfigs", (IConfiguration config)=>{
 });
 
 app.Run();
-
-
-public static class ProductRepository{
-    public static List<Product> Products { get; set; }
-    public static void Add(Product product)
-    {
-        if(Products == null)
-            Products = new List<Product>();
-        
-        Products.Add(product);
-    }   
-
-    public static Product GetBy(string code){
-        return Products.First(p => p.Code == code);
-    }
-
-    public static void UpdateBy(string code, string name){
-        int queryResult = Products.FindIndex(x => x.Code==code);
-        Products[queryResult].Name = name;
-    }
-
-    public static void DeleteBy(string code){
-        if(Products.Find(pdct => pdct.Code == code) == null){
-            throw new NullReferenceException();
-        }
-        else{
-            Products.Remove(Products.Find(pdct => pdct.Code == code));
-        }
-    }
-}
-
-public class Category{
-    public int Id { get; set; }
-    public string Name { get; set; }
-}
-
-public class Tag{
-    public int Id { get; set; }
-    public string Name { get; set; }
-}
-
-public class Product{
-    public int Id { get; set; }
-    public string Code { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public int CategoryId { get; set; }
-    public Category Category { get; set; }
-    public List<Tag> tags { get; set;}
-    }
-
-public class ApplicationDbContext: DbContext{
-    public DbSet<Product> Products {get; set;}
-    protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlServer("Server=localhost;Database=Products;User Id=sa;Password=HaYaBuSa10022004@;MultipleActiveResultSets=true;Encrypt=YES;TrustServerCertificate=YES");
-
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        builder.Entity<Product>().Property(p => p.Description).HasMaxLength(500).IsRequired(false);
-        builder.Entity<Product>().Property(p => p.Description).HasMaxLength(120).IsRequired(true);
-        builder.Entity<Product>().Property(p => p.Description).HasMaxLength(20).IsRequired(true);
-    }
-}
-
