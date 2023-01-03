@@ -1,6 +1,8 @@
+using System.Runtime.Intrinsics.X86;
 using System;
 using System.IO.Pipes;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,50 +42,62 @@ app.MapGet("/getProductByHeader", (HttpRequest request)=>{
     return request.Headers["product-code"].ToString();
 });
 
-app.MapGet("/product/{code}", ([FromRoute] string code) =>{
-    try{
-        Product productName = ProductRepository.GetBy(code);
-        return Results.Ok(productName);
-    }
-    catch{
-        return Results.BadRequest();
-    }   
-    
+app.MapGet("/product/{id}", ([FromRoute] int Id, ApplicationDbContext context) =>{
+   var product = context.Products.Include(p => p.Category).Include(p => p.tags).Where(p => p.Id == Id).First();
+   if(product != null)
+   {
+        return Results.Ok(product);
+   }
+   return Results.NotFound();
+   
 });
 
-app.MapPost("/product", (Product product)=>{
-    try{
-    ProductRepository.Add(
-    new Product{
-        Name = product.Name,
-        Code = product.Code
-    });
-        return Results.Created($"/product/{product.Code}", product.Code);
+app.MapPost("/product", (ProductDto productRequest, ApplicationDbContext context)=>{
+    var Category = context.Category.Where(c => c.Id == productRequest.CategoryId).First();
+    var product = new Product{
+        Code = productRequest.Code,
+        Name = productRequest.Name,
+        Description = productRequest.Description,
+        Category = Category
+    };
+    if(productRequest.Tags != null)
+    {
+        product.tags = new List<Tag>();
+        foreach(var item in productRequest.Tags){
+            product.tags.Add(new Tag{Name = item});
+        }
     }
-    catch{
-        return Results.BadRequest();
-    }
+    context.Products.Add(product);
+    context.SaveChanges();
+    return Results.Created($"/products/{product.Id}", product.Code);
 });
 
-app.MapPut("/product", (Product product)=>{
-    try{
-        ProductRepository.UpdateBy(product.Code, product.Name);
+app.MapPut("/product/{id}", ([FromRoute] int Id, ProductDto productRequest, ApplicationDbContext context)=>{
+        var product = context.Products.Include(p => p.Category).Include(p => p.tags).Where(p => p.Id == Id).First();
+        var Category = context.Category.Where(c => c.Id == productRequest.CategoryId).First();
+
+        product.Code =productRequest.Code;
+        product.Name = productRequest.Name;
+        product.Description = productRequest.Description;
+        product.Category =  Category;
+        product.tags = new List<Tag>();
+        if(productRequest.Tags != null)
+        {
+            product.tags = new List<Tag>();
+            foreach(var item in productRequest.Tags){
+                product.tags.Add(new Tag{Name = item});
+            }
+        }
+
+        context.SaveChanges();
         return Results.Ok();
-    }
-    catch{
-        return Results.BadRequest();
-    }
 });
 
-app.MapDelete("/product/{code}", ([FromRoute] string Code)=>{
-    try{
-        ProductRepository.DeleteBy(Code);
-        return Results.Ok();
-    }
-    catch{
-        return Results.BadRequest();
-        
-    }
+app.MapDelete("/product/{id}", ([FromRoute] int Id, ApplicationDbContext context)=>{
+    var product = context.Products.Where(p => p.Id == Id).First();
+    context.Products.Remove(product);
+    context.SaveChanges();
+    return Results.Ok();
 });
 
 app.MapGet("/baseConfigs", (IConfiguration config)=>{

@@ -7,6 +7,8 @@ public class ApplicationDbContext: DbContext{
     }
 
     public DbSet<Product> Products {get; set;}
+    public DbSet<Category> Category { get; set; }
+    public DbSet<Tag> Tag { get; set; }
     // protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlServer("Server=localhost;Database=Products;User Id=sa;Password=HaYaBuSa10022004@;MultipleActiveResultSets=true;Encrypt=YES;TrustServerCertificate=YES");
 
     protected override void OnModelCreating(ModelBuilder builder)
